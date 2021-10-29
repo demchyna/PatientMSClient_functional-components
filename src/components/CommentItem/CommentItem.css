@@ -1,0 +1,11 @@
+#comment-item > div > textarea {
+
+}
+
+#comment-btn > div {
+    width: 140px;
+}
+
+#comment-btn > div > button {
+    width: 60px;
+}

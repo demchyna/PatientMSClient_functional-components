@@ -1,0 +1,24 @@
+#patient-item {
+    height: 80px;
+    padding-top: 0.4rem;
+}
+
+#patient-item:hover {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.active {
+    background-color: chartreuse;
+}
+
+#patient-item > a {
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+}
+
+#patient-item > a:hover {
+    color: black;
+}
+
