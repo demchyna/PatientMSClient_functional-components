@@ -1,11 +1,7 @@
-import React, {useState} from 'react';
 import {Link} from "react-router-dom";
 import "./PatientItem.css"
 
 const PatientItem = ({patient, ...props}) => {
-
-    const [active, setActive] = useState("");
-
     return (
         <li id="patient-item" className="alert alert-secondary">
             <Link to={'/patient/' + patient.id + '/info'} >

@@ -1,38 +1,19 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useHistory, useParams} from "react-router-dom";
-import RequestService from "../../RequestService/RequestService";
+import RequestService from "../../services/RequestService";
 import CommentList from "../CommentList/CommentList";
+import {PatientsContext} from "../../contexts/ParientsContext";
 
 const PatientInfo = (props) => {
 
-    const [patient, setPatient] = useState({
-        id: 0,
-        firstName: '',
-        lastName: '',
-        birthday: '',
-        gender: '',
-        country: '',
-        state: '',
-        address: ''
-    });
-
+    const [patients, setPatients] = useContext(PatientsContext);
     const params = useParams();
+    const [patient, setPatient] = useState(patients.find(p => p.id === Number(params.id)));
+    const router = useHistory();
 
     useEffect(() => {
-        RequestService.readPatientById(params.id)
-            .then(response => setPatient(response.data))
-            .catch(error => {
-                if (error.response) {
-                    console.log(error.response.data);
-                } else if (error.request) {
-                    console.log(error.request.url);
-                } else {
-                    console.log("Unknown error!");
-                }
-            });
+        setPatient(patients.find(p => p.id === Number(params.id)));
     }, [params.id]);
-
-    const router = useHistory();
 
     function editPatientHandler() {
         router.push({ pathname: '/patient/' + patient.id + '/update' });
@@ -40,7 +21,10 @@ const PatientInfo = (props) => {
 
     function deletePatientHandler() {
         RequestService.deletePatient(params.id)
-            .then(response => router.push({ pathname: '/'}))
+            .then(response => {
+                setPatients(patients.filter(p => p.id !== Number(params.id)));
+                router.push({ pathname: '/patient/' +  patients[0].id + '/info'});
+            })
             .catch(error => {
                 if (error.response) {
                     console.log(error.response.data);
@@ -66,7 +50,6 @@ const PatientInfo = (props) => {
                         <span className="fs-3">{patient.firstName} {patient.lastName}</span>
                         <span className="fs-5 mt-1">{getYearsOld(patient.birthday)} years old</span>
                     </div>
-                    {/*<hr/>*/}
 
                     <div className="alert alert-secondary mt-3">
                         <div className="alert alert-light d-flex fs-5">

@@ -1,13 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
-import RequestService from "../../RequestService/RequestService";
+import RequestService from "../../services/RequestService";
 import CommentItem from "../CommentItem/CommentItem";
 import "./CommentList.css"
+import {PatientsContext} from "../../contexts/ParientsContext";
 
-const CommentList = () => {
+const CommentList = (props) => {
     const params = useParams();
-
-    const [comments, setComments] = useState([]);
+    const [patients] = useContext(PatientsContext);
+    const [comments, setComments] = useState(() => {
+        const result = patients.find(p => p.id === Number(params.id)).comments
+        if (result) return result;
+        return [];
+    });
     const [comment, setComment] = useState({
         text: '',
         createdAt: '',
@@ -15,22 +20,8 @@ const CommentList = () => {
     })
 
     useEffect(() => {
-        getAllCommentsByPatientId(params.id);
+        setComments(patients.find(p => p.id === Number(params.id)).comments);
     }, [params.id]);
-
-    function getAllCommentsByPatientId(id) {
-        RequestService.readAllCommentsByPatientId(id)
-            .then(response => setComments(response.data))
-            .catch(error => {
-                if (error.response) {
-                    console.log(error.response.data);
-                } else if (error.request) {
-                    console.log(error.request.url);
-                } else {
-                    console.log("Unknown error!");
-                }
-            });
-    }
 
     function createCommentHandler(event) {
         event.preventDefault();
@@ -67,6 +58,7 @@ const CommentList = () => {
                 <ul id="comment-list" className="no-list">
                     {
                         comments.map(comment => {
+                            comment.patientId = params.id;
                             return <CommentItem comment={comment} remove={removeComment} key={comment.id}/>
                         })
                     }

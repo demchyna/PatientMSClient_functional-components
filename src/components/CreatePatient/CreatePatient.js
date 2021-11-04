@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
-import RequestService from "../../RequestService/RequestService";
+import React, {useContext, useState} from 'react';
+import RequestService from "../../services/RequestService";
 import {useHistory} from "react-router-dom";
+import {PatientsContext, usePatients} from "../../contexts/ParientsContext";
 
 const CreatePatient = (props) => {
 
@@ -13,7 +14,7 @@ const CreatePatient = (props) => {
         state: '',
         address: ''
     })
-
+    const [patients, setPatients] = useContext(PatientsContext);
     const router = useHistory();
 
     function createPatientHandler(event) {
@@ -21,7 +22,12 @@ const CreatePatient = (props) => {
 
         RequestService.createPatient(patient)
             .then(response => {
-                router.push({ pathname: '/patient/' +  response.data.id + '/info'});
+                const patient = response.data;
+                patient.comments = [];
+                console.log(patient);
+
+                setPatients([...patients, patient]);
+                router.push({ pathname: '/patient/' +  patient.id + '/info'});
             })
             .catch(error => {
                 if (error.response) {

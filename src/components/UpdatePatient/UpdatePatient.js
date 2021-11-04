@@ -1,46 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useHistory, useParams} from "react-router-dom";
-import RequestService from "../../RequestService/RequestService";
+import RequestService from "../../services/RequestService";
+import {PatientsContext} from "../../contexts/ParientsContext";
 
-const UpdatePatient = () => {
+const UpdatePatient = (props) => {
 
-    const [patient, setPatient] = useState({
-        firstName: '',
-        lastName: '',
-        birthday: '',
-        gender: '',
-        country: '',
-        state: '',
-        address: ''
-    });
-
+    const [patients, setPatients] = useContext(PatientsContext);
     const params = useParams();
-
-    useEffect(() => {
-        getPatientById(params.id)
-    }, [params.id]);
-
-    function getPatientById(id) {
-        RequestService.readPatientById(id)
-            .then(response => setPatient(response.data))
-            .catch(error => {
-                if (error.response) {
-                    console.log(error.response.data);
-                } else if (error.request) {
-                    console.log(error.request.url);
-                } else {
-                    console.log("Unknown error!");
-                }
-            });
-    }
-
+    const [patient, setPatient] = useState(patients.find(p => p.id === Number(params.id)));
     const router = useHistory();
 
     function updatePatientHandler(event) {
         event.preventDefault();
-
         RequestService.updatePatient(patient)
             .then(response => {
+                patients[patients.findIndex(p => p.id === patient.id)] = patient;
+                setPatients(patients);
                 router.push({ pathname: '/patient/' +  response.data.id + '/info'});
             })
             .catch(error => {

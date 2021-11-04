@@ -1,40 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import PatientItem from "../PatientItem/PatientItem";
-import RequestService from "../../RequestService/RequestService";
-import {useHistory, useParams} from "react-router-dom";
+import {useHistory} from "react-router-dom";
 import './PatientList.css';
+import {PatientsContext, usePatients} from "../../contexts/ParientsContext";
 
 const PatientList = (props) => {
 
-    const [patients, setPatients] = useState([]);
+    const [patients] = useContext(PatientsContext);
     const [searchValue, setSearchValue] = useState('');
-
-    const params = useParams();
-
     const router = useHistory();
-
-    useEffect(() => {
-        getAllPatients();
-    }, [params.id, router.location.pathname]);
-
-    function getAllPatients() {
-        RequestService.readAllPatients()
-            .then(response => {
-                setPatients(response.data)
-                if (router.location.pathname === "/") {
-                    router.push({ pathname: '/patient/' +  response.data[0].id + '/info'});
-                }
-            })
-            .catch(error => {
-                if (error.response) {
-                    console.log(error.response.data);
-                } else if (error.request) {
-                    console.log(error.request.url);
-                } else {
-                    console.log("Unknown error!");
-                }
-            });
-    }
 
     function addNewPatientHandler() {
         router.push({ pathname: '/patient/create' });
@@ -51,9 +25,9 @@ const PatientList = (props) => {
             <ul className="no-list mx-3">
                 {
                     patients
-                        .filter(patient => searchValue === ''
-                            || patient.firstName.includes(searchValue)
-                            || patient.lastName.includes(searchValue))
+                        .filter(patient => searchValue.toLowerCase() === ''
+                            || patient.firstName.toLowerCase().includes(searchValue)
+                            || patient.lastName.toLowerCase().includes(searchValue))
                         .map(patient => {
                         return <PatientItem patient={patient} key={patient.id}/>
                     })

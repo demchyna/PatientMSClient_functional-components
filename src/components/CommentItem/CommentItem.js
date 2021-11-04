@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import RequestService from "../../RequestService/RequestService";
+import RequestService from "../../services/RequestService";
 import "./CommentItem.css"
 
 const CommentItem = ({comment, remove, ...props}) => {
@@ -13,6 +13,7 @@ const CommentItem = ({comment, remove, ...props}) => {
 
     function saveCommentHandler() {
         setVisible(true);
+        console.log(comment);
 
         RequestService.updateComment(newComment)
             .then(response => setNewComment(response.data))
